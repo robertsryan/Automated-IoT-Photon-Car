@@ -1,0 +1,48 @@
+//Motor 1, enabling the appropriate pins on the Particle Photon and setting motor definitions
+
+int phasePinPH = D0;
+int enablePinEH = D1;
+bool MOTOR_speed = FALSE;
+bool MOTOR_direction = FALSE;
+int on_speed = 90;
+int off_speed = 0;
+int x = 1;
+int analogvalue = 0;
+
+using namespace std;
+
+//Setting up pin modes and Particle event definitions as well as motor functions
+
+void setup() {
+Particle.variable("analogvalue", analogvalue);
+pinMode(phasePinPH, OUTPUT);
+pinMode(enablePinEH, OUTPUT);
+analogWrite(enablePinEH, on_speed, 60000);
+digitalWrite(phasePinPH, MOTOR_direction);
+Particle.subscribe("colorIsGreen", myGreen, ALL_DEVICES);
+Particle.subscribe("colorIsRed", myRed, ALL_DEVICES);
+Serial.begin(9600);
+}
+
+void loop() {
+    MOTOR_speed = TRUE;
+}
+
+//The myGreen and myRed functions are both functions that publish "Particle events" which allow the two photons
+//in use to communicate with each other. 
+
+void myGreen(const char *event, const char data) //event is name of event,
+*data is data that came with event
+{
+     Serial.println("Motor Starting");
+     analogWrite(enablePinEH, 75, 60000);
+     Particle.publish("motorStarted", "vroomVroom", PUBLIC);
+}
+
+void myRed(const char *event, const char data) //event is name of event,
+*data is data that came with event
+{
+     Serial.println("Motor Stopping");
+     analogWrite(enablePinEH, 0, 60000);
+     Particle.publish("motorStopped", "haltHalt", PUBLIC);
+}
