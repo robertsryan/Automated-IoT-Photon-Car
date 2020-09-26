@@ -1,0 +1,64 @@
+// This #include statement was automatically added by the Particle IDE.
+#include <Adafruit_TCS34725.h>
+#include <Wire.h>
+#include "Adafruit_TCS34725.h"
+
+Adafruit_TCS34725 RGBSensor =
+Adafruit_TCS34725(TCS34725_INTEGRATIONTIME_50MS, TCS34725_GAIN_1X);
+
+void startMotor();
+void slowDownMotor();
+bool isGreen(false); //State variable for clarity
+
+void setup(){
+ Serial.begin(9600);
+ Particle.variable("isGreen", isGreen);
+ if (RGBSensor.begin()) { //If sensor works, program starts
+      Serial.println("Photon GreenLightRedLight starting");
+ }
+ else{
+      while(1){ //Wait until sensor works
+         Serial.println("Not working");
+         delay(100);
+         if(RGBSensor.begin()){ break; }
+      }
+  }
+}
+
+void loop(){
+   uint16_t r, g, b, c;
+   
+   RGBSensor.setInterrupt(false);
+   
+   delay(60);
+   RGBSensor.getRawData(&r, &g, &b, &c);
+   RGBSensor.setInterrupt(true);
+   
+   
+   Serial.print("R:\t"); Serial.print(int(r));
+   Serial.print("\tG:\t"); Serial.print(int(g));
+   Serial.print("\tB:\t"); Serial.println(int(b));
+   //Print the raw data to the screen
+   
+   if(r > 1.45*g){  //If there is red light
+       isGreen = false;
+       slowDownMotor();
+   }
+   
+   else if (g > 1.45*r){  //If there is green light
+       isGreen = true;
+       startMotor();
+   }
+   else{ //Change nothing
+       delay(100);
+   }
+}
+
+void startMotor(){
+   Particle.publish("colorIsGreen", "GREEN", PUBLIC);
+   delay(500); //Force the motors to run for at least 500 seconds
+}
+
+void slowDownMotor(){
+   Particle.publish("colorIsRed", "RED", PUBLIC);
+}
