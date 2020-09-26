@@ -1,6 +1,12 @@
 # Automated-IoT-Photon-Car
+
+
 Code created for the Automated IoT Photon Car project
+
+
 Motor/Car code and hardware worked on by Ryan Roberts
+
+
 Color sensor code and hardware worked on by Mansour Savadogo
 
 The intent of this project was to create a car that automated its operation with regard to color inputs that it might see at a stoplight. The way we went about doing this was to
